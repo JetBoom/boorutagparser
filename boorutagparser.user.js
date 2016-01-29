@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://above.average.website
-// @version      1.0
+// @version      1.0.1
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -34,7 +34,7 @@ var iv2_confidence_rating = 20.0;
 ///////
 
 var tags_selector = 'h5, b';
-var copy_button_style = 'position:fixed;width:100px;right:2px;top:2px;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(0,0,0,0.1);z-index:9999;';
+var copy_button_style = 'position:fixed;width:100px;right:2px;top:2px;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(255,255,255,0.8);z-index:9999;';
 
 function replaceAll(str, originalstr, newstr)
 {
