@@ -15,5 +15,5 @@ https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
 After you HAVE ONE OF THE ABOVE, add boorutagparser as a user script through the menu (google it or figure it out)
 
 ## Help
-### It doesn't work on <some booru>!
+### It doesn't work on X booru!
 Make a pull request or a github issue and I'll add it.
