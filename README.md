@@ -12,7 +12,7 @@ http://tampermonkey.net/
 https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
 
 ## Install
-After you HAVE ONE OF THE ABOVE, add boorutagparser as a user script through the menu (google it or figure it out)
+After you HAVE ONE OF THE ABOVE, [click this link](https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js) to add it to your browser. 
 
 ## Help
 ### It doesn't work on X booru!
