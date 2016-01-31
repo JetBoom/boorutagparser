@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://above.average.website
-// @version      1.0.3
+// @version      1.0.4
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -16,7 +16,16 @@
 // @include      *booru*/?page=post
 
 // Boorus with weird names
-// @include     *rule34.xxx/index.php?page=post*
+// @include      *rule34.xxx/index.php?page=post*
+// @include      *chan.sankakucomplex.com/post/show/*
+// @include      *chan.sankakucomplex.com/?tags=*
+// @include      *e621.net/post/*
+// @include      *konachan.com/post/*
+// @include      *shimmie.katawa-shoujo.com/post/*
+// @include      *rule34.paheal.net/post/*
+// @include      *rule34hentai.net/post/*
+// @include      *tbib.org/index.php?page=post*
+// @include      *yande.re/post/*
 
 // @run-at       document-end
 // @grant        GM_setClipboard
@@ -90,7 +99,7 @@ function insertRating(tags, selector)
 
 function copyBooruTags(tags, noRating)
 {
-    // Instead of having a list of boorus and their tag structure I just make a big catch-all.
+    // Instead of having a list of boorus and their tags and tag structures I just make a big catch-all.
 
     // danbooru-like
     insertTags(tags, '#tag-list li.category-3 > a.search-tag', 'series:');
@@ -101,11 +110,22 @@ function copyBooruTags(tags, noRating)
     // lolibooru-like
     insertTags(tags, 'li.tag-type-copyright > a', 'series:');
     insertTags(tags, 'li.tag-type-author > a', 'creator:');
+    insertTags(tags, 'li.tag-type-artist > a', 'creator:');
     insertTags(tags, 'li.tag-type-character > a', 'character:');
     insertTags(tags, 'li.tag-type-general > a', '');
+    insertTags(tags, 'li.tag-type-studio > a', 'studio:');
+    insertTags(tags, 'li.tag-type-circle > a', 'studio:');
+    insertTags(tags, 'li.tag-type-medium > a', 'medium:');
+    insertTags(tags, 'li.tag-type-style > a', 'medium:');
+    insertTags(tags, 'li.tag-type-meta > a', 'meta:');
+    insertTags(tags, 'li.tag-type-species > a', 'species:');
+    insertTags(tags, 'li.tag-type-faults > a', 'fault:');
     
     // booru.org-like
     insertTags(tags, '#tag_list li a', '');
+    
+    // paheal-like
+    insertTags(tags, 'a.tag_name', '');
 
     if (!noRating)
     {
