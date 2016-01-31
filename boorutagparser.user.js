@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://above.average.website
-// @version      1.0.4
+// @version      1.0.5
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -29,6 +29,8 @@
 
 // @run-at       document-end
 // @grant        GM_setClipboard
+// @grant        GM_setValue
+// @grant        GM_getValue
 
 // ==/UserScript==
 /* jshint -W097 */
@@ -36,14 +38,15 @@
 
 ///////
 
-var copy_key_code = 221; // ] key
-var copy_sound = 'http://heavy.noxiousnet.com/boorucopy.ogg';
-var iv2_confidence_rating = 20.0;
+var copy_key_code = GM_getValue('copy_key_code', 221); // ] key
+var copy_sound = GM_getValue('copy_sound', 'http://heavy.noxiousnet.com/boorucopy.ogg');
+var iv2_confidence_rating = GM_getValue('iv2_confidence_rating', 20.0);
 
 ///////
 
 var tags_selector = 'h5, b';
-var copy_button_style = 'position:fixed;width:100px;right:2px;top:2px;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(255,255,255,0.8);z-index:9999;';
+var button_style = 'font:11px monospace;font-weight:0;border:1px solid black;background:#eee;color:#000;display:block;width:90%;margin:2px auto;z-index:9999;';
+var div_style = 'position:fixed;width:160px;right:2px;top:2px;text-align:center;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(255,255,255,0.8);z-index:9999;';
 
 function replaceAll(str, originalstr, newstr)
 {
@@ -222,6 +225,11 @@ function doCopyAll()
     }
 }
 
+function doOptions()
+{
+    optionsArea.style.display = optionsArea.style.display == 'none' ? 'block' : 'none';
+}
+
 function doc_keyUp(e)
 {
     if (e.keyCode == copy_key_code)
@@ -238,14 +246,6 @@ for (var i=0; i < elements.length; i++)
     if (element.innerHTML == 'Tags')
     {
         element.onclick = copyBooruTags;
-
-        // hydrus stuff
-        //element.outerHTML = '<div><form enctype="multipart/form-data" action="http://localhost:45866" method="POST">'
-        //    + '<input name="file" type="file" />'
-        //    + '<input type="submit" value="Send" />'
-        //    + '</form></div> '
-        //    + element.outerHTML;
-
         break;
     }
 }
@@ -259,13 +259,77 @@ if (copy_sound.length > 0)
 
 function playCopySound()
 {
-    if (audio)
+    if (audio && copy_sound.length > 0)
         audio.play();
 }
 
-var copyButtonArea = document.createElement('button');
-copyButtonArea.innerHTML = 'copy tags';
-copyButtonArea.id = 'copytagsbutton';
-copyButtonArea.setAttribute('style', copy_button_style);
-copyButtonArea.onclick = doCopyAll;
-document.body.appendChild(copyButtonArea);
+function doChangeConfidence(e)
+{
+    iv2_confidence_rating = Number(optionForConfidence.value);
+    captionForConfidence.innerHTML = 'iv2 min confidence: ' + iv2_confidence_rating + '%';
+    GM_setValue('iv2_confidence_rating', iv2_confidence_rating);
+}
+
+function doChangeCopySound(e)
+{
+    copy_sound = String(optionForCopySound.value);
+    GM_setValue('copy_sound', copy_sound);
+    
+    if (audio)
+        audio.src = copy_sound;
+}
+
+var control = document.createElement('div');
+control.id = 'boorutagparser';
+control.setAttribute('style', div_style);
+document.body.appendChild(control);
+
+var copyButton = document.createElement('button');
+copyButton.innerHTML = 'copy tags';
+copyButton.id = 'copytagsbutton';
+copyButton.setAttribute('style', button_style);
+copyButton.onclick = doCopyAll;
+control.appendChild(copyButton);
+
+var optionsButton = document.createElement('button');
+optionsButton.innerHTML = 'options';
+optionsButton.id = 'optionsbutton';
+optionsButton.setAttribute('style', button_style);
+optionsButton.onclick = doOptions;
+control.appendChild(optionsButton);
+
+var optionsArea = document.createElement('div');
+optionsArea.id = 'optionsarea';
+optionsArea.setAttribute('style', 'display:none;');
+control.appendChild(optionsArea);
+
+var captionForConfidence = document.createElement('span');
+captionForConfidence.id = 'captionconfidence';
+captionForConfidence.innerHTML = 'iv2 min confidence: ' + iv2_confidence_rating + '%';
+optionsArea.appendChild(captionForConfidence);
+
+var optionForConfidence = document.createElement('input');
+optionForConfidence.id = 'optionsconfidence';
+optionForConfidence.setAttribute('type', 'range');
+optionForConfidence.setAttribute('value', iv2_confidence_rating);
+optionForConfidence.setAttribute('min', 0);
+optionForConfidence.setAttribute('max', 100);
+optionForConfidence.onchange = doChangeConfidence;
+optionsArea.appendChild(optionForConfidence);
+
+var captionForCopySound = document.createElement('span');
+captionForCopySound.id = 'captioncopysound';
+captionForCopySound.innerHTML = 'copy sound url';
+optionsArea.appendChild(captionForCopySound);
+
+var optionForCopySound = document.createElement('input');
+optionForCopySound.id = 'optionssound';
+optionForCopySound.setAttribute('value', copy_sound);
+optionForCopySound.setAttribute('style', 'font-size:10px;width:90%;margin:1px auto;');
+optionForCopySound.onchange = doChangeCopySound;
+optionsArea.appendChild(optionForCopySound);
+
+var version = document.createElement('div');
+version.innerHTML = GM_info.script.version;
+version.setAttribute('style', 'font-size:8px;');
+optionsArea.appendChild(version);
