@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://above.average.website
-// @version      1.0.5
+// @version      1.0.6
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -26,6 +26,7 @@
 // @include      *rule34hentai.net/post/*
 // @include      *tbib.org/index.php?page=post*
 // @include      *yande.re/post/*
+// @include      *nhentai.net/g/*
 
 // @run-at       document-end
 // @grant        GM_setClipboard
@@ -41,12 +42,15 @@
 var copy_key_code = GM_getValue('copy_key_code', 221); // ] key
 var copy_sound = GM_getValue('copy_sound', 'http://heavy.noxiousnet.com/boorucopy.ogg');
 var iv2_confidence_rating = GM_getValue('iv2_confidence_rating', 20.0);
+var attach_explicit = GM_getValue('attach_explicit', true);
+var attach_gid = GM_getValue('attach_gid', true);
+var div_top = GM_getValue('div_top', false);
 
 ///////
 
 var tags_selector = 'h5, b';
 var button_style = 'font:11px monospace;font-weight:0;border:1px solid black;background:#eee;color:#000;display:block;width:90%;margin:2px auto;z-index:9999;';
-var div_style = 'position:fixed;width:160px;right:2px;top:2px;text-align:center;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(255,255,255,0.8);z-index:9999;';
+var div_style = 'opacity:0.2;position:fixed;width:240px;right:2px;top:2px;text-align:center;font:11px monospace;font-weight:0;border:1px solid black;background:rgba(255,255,255,0.8);z-index:9999;';
 
 function replaceAll(str, originalstr, newstr)
 {
@@ -100,8 +104,59 @@ function insertRating(tags, selector)
     }
 }
 
-function copyBooruTags(tags, noRating)
+function copyNHentaiTags(noRating)
 {
+    // nhentai has a json output we can use.
+    // Which is nice because the tags are available even if viewing an individual file.
+    
+    var id = window.location.href.match('/g/(\\d+)/*')[1];
+    if (!id)
+        return;
+    
+    id = Number(id);
+    
+    fetch('http://nhentai.net/g/' + id + '/json').then(function(response) {
+        return response.json();
+    }).then(function(json) {
+        var tags = [];
+
+        if (json.tags)
+        {
+            for (var i=0; i < json.tags.length; i++)
+            {
+                var tagtype = json.tags[i][1];
+                var tag = json.tags[i][2];
+
+                // maintain schema consistency
+                if (tagtype == 'group')
+                    tagtype = 'studio';
+                else if (tagtype == 'parody')
+                    tagtype = 'series';
+                else if (tagtype == 'artist')
+                    tagtype = 'creator';
+
+                if (tagtype != 'tag')
+                    tag = tagtype + ':' + tag;
+
+                tags[tags.length] = tag;
+            }
+        }
+
+        if (attach_explicit)
+            tags[tags.length] = 'rating:explicit';
+
+        if (attach_gid && json.id)
+            tags[tags.length] = 'gallery:' + json.id;
+
+        copyTagsToClipboard(tags);
+    }).catch(function(err) {
+        console.log('couldn\'t get json!');
+    });
+}
+
+function copyBooruTags(noRating)
+{
+    var tags = [];
     // Instead of having a list of boorus and their tags and tag structures I just make a big catch-all.
 
     // danbooru-like
@@ -123,10 +178,10 @@ function copyBooruTags(tags, noRating)
     insertTags(tags, 'li.tag-type-meta > a', 'meta:');
     insertTags(tags, 'li.tag-type-species > a', 'species:');
     insertTags(tags, 'li.tag-type-faults > a', 'fault:');
-    
+
     // booru.org-like
     insertTags(tags, '#tag_list li a', '');
-    
+
     // paheal-like
     insertTags(tags, 'a.tag_name', '');
 
@@ -134,25 +189,15 @@ function copyBooruTags(tags, noRating)
     {
         // danbooru-like
         insertRating(tags, '#post-information > ul li');
-        
+
         // lolibooru-like
         insertRating(tags, '#stats > ul li');
-        
+
         // booru.org-like
         insertRating(tags, '#tag_list ul');
     }
 
-    /*var elements = document.querySelectorAll(tags_selector);
-    for (var i=0; i < elements.length; i++)
-    {
-        var element = elements[i];
-        if (element.innerHTML == 'Tags')
-        {
-            element.innerHTML = 'Tags (Copied)';
-            element.style.color = 'lime';
-            break;
-        }
-    }*/
+    copyTagsToClipboard(tags);
 }
 
 function insertI2VTags(tags, selector, prefix, confidenceRequired)
@@ -186,8 +231,10 @@ function insertI2VTags(tags, selector, prefix, confidenceRequired)
     }
 }
 
-function copyI2VTags(tags, confidenceRequired, noGeneral, noRating)
+function copyI2VTags(confidenceRequired, noGeneral, noRating)
 {
+    var tags = [];
+
     insertI2VTags(tags, 'table#copyright_root tr', 'series:', confidenceRequired);
     insertI2VTags(tags, 'table#character_root tr', 'character:', confidenceRequired);
 
@@ -196,27 +243,36 @@ function copyI2VTags(tags, confidenceRequired, noGeneral, noRating)
 
     if (!noRating)
         insertI2VTags(tags, 'table#rating_root tr', 'rating:', confidenceRequired);
+
+    copyTagsToClipboard(tags);
 }
 
 function doCopyAll()
 {
-    var tags = [];
+    control.style.opacity = '1';
+    
+    if (window.location.href.indexOf('nhentai.net') >= 0)
+        copyNHentaiTags();
+    else if (window.location.href.indexOf('illustration2vec.net') >= 0)
+        copyI2VTags(iv2_confidence_rating, false);
+    else
+        copyBooruTags();
+}
 
-    copyBooruTags(tags);
-    copyI2VTags(tags, iv2_confidence_rating, false);
-
+function copyTagsToClipboard(tags)
+{
     GM_setClipboard(tags.join('\n'));
-    
+
     var buttontext = '';
-    
+
     if (tags.length > 0)
     {
         playCopySound();
-        buttontext = 'copied ' +  tags.length +' tag(s)'
+        buttontext = 'copied ' +  tags.length +' tag(s)';
     }
     else
         buttontext = 'nothing to copy!';
-    
+
     var button = document.querySelector('button#copytagsbutton');
     if (button)
     {
@@ -274,14 +330,45 @@ function doChangeCopySound(e)
 {
     copy_sound = String(optionForCopySound.value);
     GM_setValue('copy_sound', copy_sound);
-    
+
     if (audio)
         audio.src = copy_sound;
+}
+
+function doChangeAttachExplicit(e)
+{
+    attach_explicit = optionForAttachExplicit.checked;
+    GM_setValue('attach_explicit', attach_explicit);
+}
+
+function doChangeAttachGID(e)
+{
+    attach_gid = optionForAttachGID.checked;
+    GM_setValue('attach_gid', attach_gid);
+}
+
+function doChangeDivTop(e)
+{
+    div_top = optionForDivTop.checked;
+    GM_setValue('div_top', div_top);
+
+    if (div_top)
+    {
+        control.style.top = '2px';
+        control.style.bottom = '';
+    }
+    else
+    {
+        control.style.top = '';
+        control.style.bottom = '2px';
+    }
 }
 
 var control = document.createElement('div');
 control.id = 'boorutagparser';
 control.setAttribute('style', div_style);
+control.onmouseenter = function(e) { this.style.opacity = 1; };
+control.onmouseleave = function(e) { this.style.opacity = 0.2; };
 document.body.appendChild(control);
 
 var copyButton = document.createElement('button');
@@ -303,19 +390,45 @@ optionsArea.id = 'optionsarea';
 optionsArea.setAttribute('style', 'display:none;');
 control.appendChild(optionsArea);
 
-var captionForConfidence = document.createElement('span');
-captionForConfidence.id = 'captionconfidence';
-captionForConfidence.innerHTML = 'iv2 min confidence: ' + iv2_confidence_rating + '%';
-optionsArea.appendChild(captionForConfidence);
+if (window.location.href.indexOf('illustration2vec.net') >= 0)
+{
+    var captionForConfidence = document.createElement('span');
+    captionForConfidence.id = 'captionconfidence';
+    captionForConfidence.innerHTML = 'iv2 min confidence: ' + iv2_confidence_rating + '%';
+    optionsArea.appendChild(captionForConfidence);
 
-var optionForConfidence = document.createElement('input');
-optionForConfidence.id = 'optionsconfidence';
-optionForConfidence.setAttribute('type', 'range');
-optionForConfidence.setAttribute('value', iv2_confidence_rating);
-optionForConfidence.setAttribute('min', 0);
-optionForConfidence.setAttribute('max', 100);
-optionForConfidence.onchange = doChangeConfidence;
-optionsArea.appendChild(optionForConfidence);
+    var optionForConfidence = document.createElement('input');
+    optionForConfidence.id = 'optionsconfidence';
+    optionForConfidence.setAttribute('type', 'range');
+    optionForConfidence.setAttribute('value', iv2_confidence_rating);
+    optionForConfidence.setAttribute('min', 0);
+    optionForConfidence.setAttribute('max', 100);
+    optionForConfidence.onchange = doChangeConfidence;
+    optionsArea.appendChild(optionForConfidence);
+}
+
+if (window.location.href.indexOf('nhentai.net/g/') >= 0)
+{
+    var optionForAttachExplicit = document.createElement('input');
+    optionForAttachExplicit.setAttribute('type', 'checkbox');
+    optionForAttachExplicit.checked = attach_explicit;
+    optionForAttachExplicit.onchange = doChangeAttachExplicit;
+    optionsArea.appendChild(optionForAttachExplicit);
+
+    var captionForAttachExplicit = document.createElement('span');
+    captionForAttachExplicit.innerHTML = 'add rating:explicit<br>';
+    optionsArea.appendChild(captionForAttachExplicit);
+
+    var optionForAttachGID = document.createElement('input');
+    optionForAttachGID.setAttribute('type', 'checkbox');
+    optionForAttachGID.checked = attach_gid;
+    optionForAttachGID.onchange = doChangeAttachGID;
+    optionsArea.appendChild(optionForAttachGID);
+
+    var captionForAttachGID = document.createElement('span');
+    captionForAttachGID.innerHTML = 'add gallery:id#<br>';
+    optionsArea.appendChild(captionForAttachGID);
+}
 
 var captionForCopySound = document.createElement('span');
 captionForCopySound.id = 'captioncopysound';
@@ -325,11 +438,23 @@ optionsArea.appendChild(captionForCopySound);
 var optionForCopySound = document.createElement('input');
 optionForCopySound.id = 'optionssound';
 optionForCopySound.setAttribute('value', copy_sound);
-optionForCopySound.setAttribute('style', 'font-size:10px;width:90%;margin:1px auto;');
+optionForCopySound.setAttribute('style', 'display:block;font-size:10px;width:90%;margin:1px auto;');
 optionForCopySound.onchange = doChangeCopySound;
 optionsArea.appendChild(optionForCopySound);
+
+var optionForDivTop = document.createElement('input');
+optionForDivTop.setAttribute('type', 'checkbox');
+optionForDivTop.checked = div_top;
+optionForDivTop.onchange = doChangeDivTop;
+optionsArea.appendChild(optionForDivTop);
+
+var captionForDivTop = document.createElement('span');
+captionForDivTop.innerHTML = 'attach to top of page<br>';
+optionsArea.appendChild(captionForDivTop);
 
 var version = document.createElement('div');
 version.innerHTML = GM_info.script.version;
 version.setAttribute('style', 'font-size:8px;');
 optionsArea.appendChild(version);
+
+doChangeDivTop();
