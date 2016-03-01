@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.0
+// @version      1.1.1
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -19,6 +19,8 @@
 // @include      *rule34.xxx/index.php?page=post*
 // @include      *chan.sankakucomplex.com/post/show/*
 // @include      *chan.sankakucomplex.com/?tags=*
+// @include      *idol.sankakucomplex.com/post/show/*
+// @include      *idol.sankakucomplex.com/?tags=*
 // @include      *e621.net/post/*
 // @include      *konachan.com/post/*
 // @include      *shimmie.katawa-shoujo.com/post/*
@@ -307,14 +309,14 @@ function makeDownloadRequest(href, tags)
         'url':'http://localhost:14007/download?' + href,
         'data':tags.join(','),
         'anonymous':true,
-        'timeout':10000,
+        'timeout':12500,
         'onerror':function() { alert('Error downloading to your local server. Is boorutagparser-server running?\nGet it at github.com/JetBoom/boorutagparser-server if you do not have it.'); }
     });
 }
 
 function doDownload()
 {
-    var a = document.querySelector('a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img');
+    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img');
     if (!a)
         return;
     
