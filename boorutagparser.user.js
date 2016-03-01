@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
-// @namespace    http://above.average.website
-// @version      1.0.6
+// @namespace    http://average.website
+// @version      1.1.0
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -26,12 +26,15 @@
 // @include      *rule34hentai.net/post/*
 // @include      *tbib.org/index.php?page=post*
 // @include      *yande.re/post/*
+
+// nhentai
 // @include      *nhentai.net/g/*
 
 // @run-at       document-end
 // @grant        GM_setClipboard
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_xmlhttpRequest
 
 // ==/UserScript==
 /* jshint -W097 */
@@ -40,6 +43,7 @@
 ///////
 
 var copy_key_code = GM_getValue('copy_key_code', 221); // ] key
+var download_key_code = GM_getValue('download_key_code', 220); // \ key
 var copy_sound = GM_getValue('copy_sound', 'http://heavy.noxiousnet.com/boorucopy.ogg');
 var iv2_confidence_rating = GM_getValue('iv2_confidence_rating', 20.0);
 var attach_explicit = GM_getValue('attach_explicit', true);
@@ -104,7 +108,7 @@ function insertRating(tags, selector)
     }
 }
 
-function copyNHentaiTags(noRating)
+function copyNHentaiTags(noRating, callback)
 {
     // nhentai has a json output we can use.
     // Which is nice because the tags are available even if viewing an individual file.
@@ -149,6 +153,9 @@ function copyNHentaiTags(noRating)
             tags[tags.length] = 'gallery:' + json.id;
 
         copyTagsToClipboard(tags);
+        
+        if (callback)
+            callback(tags);
     }).catch(function(err) {
         console.log('couldn\'t get json!');
     });
@@ -198,6 +205,8 @@ function copyBooruTags(noRating)
     }
 
     copyTagsToClipboard(tags);
+    
+    return tags;
 }
 
 function insertI2VTags(tags, selector, prefix, confidenceRequired)
@@ -245,18 +254,20 @@ function copyI2VTags(confidenceRequired, noGeneral, noRating)
         insertI2VTags(tags, 'table#rating_root tr', 'rating:', confidenceRequired);
 
     copyTagsToClipboard(tags);
+    
+    return tags;
 }
 
-function doCopyAll()
+function doCopyAll(callback)
 {
     control.style.opacity = '1';
     
     if (window.location.href.indexOf('nhentai.net') >= 0)
-        copyNHentaiTags();
+        copyNHentaiTags(null, callback);
     else if (window.location.href.indexOf('illustration2vec.net') >= 0)
-        copyI2VTags(iv2_confidence_rating, false);
+        callback(copyI2VTags(iv2_confidence_rating, false));
     else
-        copyBooruTags();
+        callback(copyBooruTags());
 }
 
 function copyTagsToClipboard(tags)
@@ -286,12 +297,38 @@ function doOptions()
     optionsArea.style.display = optionsArea.style.display == 'none' ? 'block' : 'none';
 }
 
+function makeDownloadRequest(href, tags)
+{
+    if (!tags)
+        tags = [];
+    
+    GM_xmlhttpRequest({
+        'method':'POST',
+        'url':'http://localhost:14007/download?' + href,
+        'data':tags.join(','),
+        'anonymous':true,
+        'timeout':10000,
+        'onerror':function() { alert('Error downloading to your local server. Is boorutagparser-server running?\nGet it at github.com/JetBoom/boorutagparser-server if you do not have it.'); }
+    });
+}
+
+function doDownload()
+{
+    var a = document.querySelector('a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img');
+    if (!a)
+        return;
+    
+    var href = a.src || a.href;
+    
+    doCopyAll(function(tags) { makeDownloadRequest(href, tags); } );
+}
+
 function doc_keyUp(e)
 {
     if (e.keyCode == copy_key_code)
-    {
         doCopyAll();
-    }
+    else if (e.keyCode == download_key_code)
+        doDownload();
 }
 document.addEventListener('keyup', doc_keyUp, false);
 
@@ -384,6 +421,13 @@ optionsButton.id = 'optionsbutton';
 optionsButton.setAttribute('style', button_style);
 optionsButton.onclick = doOptions;
 control.appendChild(optionsButton);
+
+var downloadButton = document.createElement('button');
+downloadButton.innerHTML = 'download with tags';
+downloadButton.id = 'downloadbutton';
+downloadButton.setAttribute('style', button_style);
+downloadButton.onclick = doDownload;
+control.appendChild(downloadButton);
 
 var optionsArea = document.createElement('div');
 optionsArea.id = 'optionsarea';
