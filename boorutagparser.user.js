@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.1
+// @version      1.1.2
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -316,7 +316,7 @@ function makeDownloadRequest(href, tags)
 
 function doDownload()
 {
-    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img');
+    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"]');
     if (!a)
         return;
     
