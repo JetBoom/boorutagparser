@@ -194,6 +194,9 @@ function copyBooruTags(noRating)
     // paheal-like
     insertTags(tags, 'a.tag_name', '');
 
+    // derpibooru-like
+    insertTags(tags, 'span.dropdown.tag > a', '');
+
     if (!noRating)
     {
         // danbooru-like
@@ -316,7 +319,7 @@ function makeDownloadRequest(href, tags)
 
 function doDownload()
 {
-    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"]');
+    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download/"], form[action*="/_images/"], source[src]');
     if (!a)
         return;
     
