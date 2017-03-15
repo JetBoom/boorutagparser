@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.2
+// @version      1.1.2derpibooru
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -21,13 +21,21 @@
 // @include      *chan.sankakucomplex.com/?tags=*
 // @include      *idol.sankakucomplex.com/post/show/*
 // @include      *idol.sankakucomplex.com/?tags=*
-// @include      *e621.net/post/*
+// @include      *behoimi.org/post/show/*
+// @include      *e621.net/post/show/*
 // @include      *konachan.com/post/*
+// @include      *konachan.net/post/*
 // @include      *shimmie.katawa-shoujo.com/post/*
 // @include      *rule34.paheal.net/post/*
 // @include      *rule34hentai.net/post/*
 // @include      *tbib.org/index.php?page=post*
 // @include      *yande.re/post/*
+// @include      *derpibooru.org*
+// @include      /^https?://derpiboo\.ru/[1-9]+/
+// @include      /^https?://derpibooru\.org/[1-9]+/
+// @include      /^https?://trixiebooru\.org/[1-9]+/
+// @include      *sofurry.com*
+// @include      *twentypercentcooler.net*
 
 // nhentai
 // @include      *nhentai.net/g/*
@@ -52,6 +60,7 @@ var attach_explicit = GM_getValue('attach_explicit', true);
 var attach_gid = GM_getValue('attach_gid', true);
 var div_top = GM_getValue('div_top', false);
 
+
 ///////
 
 var tags_selector = 'h5, b';
@@ -63,8 +72,12 @@ function replaceAll(str, originalstr, newstr)
     return str.split(originalstr).join(newstr);
 }
 
-function insertTags(tags, selector, prefix)
+function insertTags(tags, selector, prefix, stripns)
 {
+    if (typeof stripns === "undefined") {
+        stripns = false;
+    }
+
     var elements = document.querySelectorAll(selector);
 
     for (var i=0; i < elements.length; i++)
@@ -76,6 +89,10 @@ function insertTags(tags, selector, prefix)
             text = replaceAll(text, '_', ' ');
             text = replaceAll(text, '&gt;', '>');
             text = replaceAll(text, '&lt;', '<');
+
+            if (stripns) {
+                text = text.match(".*?:(.*)")[1];
+            }
 
             tags[tags.length] = prefix+text;
         }
@@ -114,13 +131,13 @@ function copyNHentaiTags(noRating, callback)
 {
     // nhentai has a json output we can use.
     // Which is nice because the tags are available even if viewing an individual file.
-    
+
     var id = window.location.href.match('/g/(\\d+)/*')[1];
     if (!id)
         return;
-    
+
     id = Number(id);
-    
+
     fetch('http://nhentai.net/g/' + id + '/json').then(function(response) {
         return response.json();
     }).then(function(json) {
@@ -155,7 +172,7 @@ function copyNHentaiTags(noRating, callback)
             tags[tags.length] = 'gallery:' + json.id;
 
         copyTagsToClipboard(tags);
-        
+
         if (callback)
             callback(tags);
     }).catch(function(err) {
@@ -179,6 +196,7 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-author > a', 'creator:');
     insertTags(tags, 'li.tag-type-artist > a', 'creator:');
     insertTags(tags, 'li.tag-type-character > a', 'character:');
+    insertTags(tags, 'li.tag-type-model > a', 'model:');
     insertTags(tags, 'li.tag-type-general > a', '');
     insertTags(tags, 'li.tag-type-studio > a', 'studio:');
     insertTags(tags, 'li.tag-type-circle > a', 'studio:');
@@ -188,14 +206,28 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-species > a', 'species:');
     insertTags(tags, 'li.tag-type-faults > a', 'fault:');
 
+    // derpibooru-like
+    insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to get work on pages with these tags, or multiple of these tags.
+    insertTags(tags, '.tag-list .tag.tag-ns-oc > a', 'character:', true);
+    insertTags(tags, '.tag-list .tag.tag-system > a', 'rating:');
+    insertTags(tags, '.tag-list [class="tag dropdown"]:not([data-tag-category="character"]):not([data-tag-category="origin"]):not([data-tag-category="spoiler"]):not([data-tag-category="episode"]) > a', ''); // generic tags on derpibooru do not have a "namespace" class of their own, this seems to be the best way to match generic tags
+    insertTags(tags, '.tag-list [data-tag-category="character"] > a', 'character:'); // grabs the new character tags on Derpibooru and gives them a proper character namespace for Hydrus
+    insertTags(tags, '.tag-list [data-tag-category="episode"] > a', 'episode:'); // grabs the show episode title and gives it an episode namespace for Hydrus
+    insertTags(tags, '[data-tag-name="edit"] > a', '') //Since derpibooru for some reason has edits tagged as an artist, this converts that to a general edit tag
+    insertTags(tags, '[data-tag-slug="derpibooru+exclusive"] > a', '') //Since derpibooru for some reason has derpi exclusives tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="edited+screencap"] > a', '') //makes the edited screencap into a general tag
+    insertTags(tags, '[data-tag-slug="screencap"] > a', '') //Makes the screencap tag into a general tag
+    insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', '') //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings  
+    
+    //SoFurry like
+    insertTags(tags, '.titlehover > a', '')
+    
     // booru.org-like
     insertTags(tags, '#tag_list li a', '');
 
     // paheal-like
     insertTags(tags, 'a.tag_name', '');
-
-    // derpibooru-like
-    insertTags(tags, 'span.dropdown.tag > a', '');
+    
 
     if (!noRating)
     {
@@ -210,7 +242,7 @@ function copyBooruTags(noRating)
     }
 
     copyTagsToClipboard(tags);
-    
+
     return tags;
 }
 
@@ -259,14 +291,14 @@ function copyI2VTags(confidenceRequired, noGeneral, noRating)
         insertI2VTags(tags, 'table#rating_root tr', 'rating:', confidenceRequired);
 
     copyTagsToClipboard(tags);
-    
+
     return tags;
 }
 
 function doCopyAll(callback)
 {
     control.style.opacity = '1';
-    
+
     if (window.location.href.indexOf('nhentai.net') >= 0)
         copyNHentaiTags(null, callback);
     else if (window.location.href.indexOf('illustration2vec.net') >= 0)
@@ -306,7 +338,7 @@ function makeDownloadRequest(href, tags)
 {
     if (!tags)
         tags = [];
-    
+
     GM_xmlhttpRequest({
         'method':'POST',
         'url':'http://localhost:14007/download?' + href,
@@ -319,12 +351,12 @@ function makeDownloadRequest(href, tags)
 
 function doDownload()
 {
-    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download/"], form[action*="/_images/"], source[src]');
+    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download"][title="Download this image at full res with a short filename"], form[action*="/_images/"], source[src]');
     if (!a)
         return;
-    
+
     var href = a.src || a.href;
-    
+
     doCopyAll(function(tags) { makeDownloadRequest(href, tags); } );
 }
 
