@@ -219,7 +219,7 @@ function copyBooruTags(noRating)
     insertTags(tags, '[data-tag-slug="screencap"] > a', '') //Makes the screencap tag into a general tag
     insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', '') //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings  
     insertTags(tags, '[data-tag-slug="alternate+version"] > a', '') //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="color+edit"] > a', '') //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag    
+    insertTags(tags, '[data-tag-slug="color+edit"] > a', '') //Since derpibooru has color edits tagged as an artist, this converts that to a general tag    
     
     // sofurry like
     insertTags(tags, '.titlehover > a', '')
