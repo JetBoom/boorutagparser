@@ -207,7 +207,7 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-faults > a', 'fault:');
 
     // derpibooru-like
-    insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
+     insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
     insertTags(tags, '.tag-list .tag.tag-ns-oc > a', 'character:', true);
     insertTags(tags, '.tag-list .tag.tag-system > a', 'rating:');
     insertTags(tags, '.tag-list [class="tag dropdown"]:not([data-tag-category="character"]):not([data-tag-category="origin"]):not([data-tag-category="spoiler"]):not([data-tag-category="episode"]) > a', ''); // generic tags on derpibooru do not have a "namespace" class of their own, this seems to be the best way to match generic tags
@@ -219,6 +219,7 @@ function copyBooruTags(noRating)
     insertTags(tags, '[data-tag-slug="screencap"] > a', '') //Makes the screencap tag into a general tag
     insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', '') //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings  
     insertTags(tags, '[data-tag-slug="alternate+version"] > a', '') //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="color+edit"] > a', '') //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag    
     
     // sofurry like
     insertTags(tags, '.titlehover > a', '')
