@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.3
+// @version      1.1.4
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -220,8 +220,6 @@ function copyBooruTags(noRating)
     insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', ''); //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings
     insertTags(tags, '[data-tag-slug="alternate+version"] > a', ''); //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
     insertTags(tags, '[data-tag-slug="color+edit"] > a', ''); //Since derpibooru has color edits tagged as an artist, this converts that to a general tag
-    //insertTags(tags, '[data-tag-id="201959"] > a', ''); //Adds them's fightin' herds as a series tag
-    //insertTags(tags, '[data-tag-name="them's fightin' herds"] > a', 'series:'); //Adds them's fightin' herds as a series tag
     insertTags(tags, '[data-tag-slug="them%27s+fightin%27+herds"] > a', 'series:'); //Adds them's fightin' herds as a series tag
 
     // sofurry like
