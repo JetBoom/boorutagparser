@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.3
+// @version      1.1.4
 // @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
 // @author       William Moodhe
 // @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
@@ -207,22 +207,23 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-faults > a', 'fault:');
 
     // derpibooru-like
-     insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
+     insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]):not([data-tag-slug="them%27s+fightin%27+herds"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
     insertTags(tags, '.tag-list .tag.tag-ns-oc > a', 'character:', true);
     insertTags(tags, '.tag-list .tag.tag-system > a', 'rating:');
     insertTags(tags, '.tag-list [class="tag dropdown"]:not([data-tag-category="character"]):not([data-tag-category="origin"]):not([data-tag-category="spoiler"]):not([data-tag-category="episode"]) > a', ''); // generic tags on derpibooru do not have a "namespace" class of their own, this seems to be the best way to match generic tags
     insertTags(tags, '.tag-list [data-tag-category="character"] > a', 'character:'); // grabs the new character tags on Derpibooru and gives them a proper character namespace for Hydrus
     insertTags(tags, '.tag-list [data-tag-category="episode"] > a', 'episode:'); // grabs the show episode title and gives it an episode namespace for Hydrus
-    insertTags(tags, '[data-tag-name="edit"] > a', '') //Since derpibooru has edits tagged as an artist, this converts that to a general edit tag
-    insertTags(tags, '[data-tag-slug="derpibooru+exclusive"] > a', '') //Since derpibooru has derpi exclusives tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="edited+screencap"] > a', '') //makes the edited screencap into a general tag
-    insertTags(tags, '[data-tag-slug="screencap"] > a', '') //Makes the screencap tag into a general tag
-    insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', '') //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings  
-    insertTags(tags, '[data-tag-slug="alternate+version"] > a', '') //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="color+edit"] > a', '') //Since derpibooru has color edits tagged as an artist, this converts that to a general tag    
-    
+    insertTags(tags, '[data-tag-name="edit"] > a', ''); //Since derpibooru has edits tagged as an artist, this converts that to a general edit tag
+    insertTags(tags, '[data-tag-slug="derpibooru+exclusive"] > a', ''); //Since derpibooru has derpi exclusives tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="edited+screencap"] > a', ''); //makes the edited screencap into a general tag
+    insertTags(tags, '[data-tag-slug="screencap"] > a', ''); //Makes the screencap tag into a general tag
+    insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', ''); //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings
+    insertTags(tags, '[data-tag-slug="alternate+version"] > a', ''); //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="color+edit"] > a', ''); //Since derpibooru has color edits tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="them%27s+fightin%27+herds"] > a', 'series:'); //Adds them's fightin' herds as a series tag
+
     // sofurry like
-    insertTags(tags, '.titlehover > a', '')
+    insertTags(tags, '.titlehover > a', '');
     
     // booru.org-like
     insertTags(tags, '#tag_list li a', '');
@@ -353,7 +354,7 @@ function makeDownloadRequest(href, tags)
 
 function doDownload()
 {
-    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download"][title="Download this image at full res with a short filename"], form[action*="/_images/"], source[src]');
+    var a = document.querySelector('a#highres, a[itemprop="contentSize"], a.original-file-unchanged, li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download"][title="Download (short filename)"], form[action*="/_images/"], source[src]');
     if (!a)
         return;
 
