@@ -54,12 +54,15 @@
 
 var copy_key_code = GM_getValue('copy_key_code', 221); // ] key
 var download_key_code = GM_getValue('download_key_code', 220); // \ key
-var copy_sound = GM_getValue('copy_sound', 'http://heavy.noxiousnet.com/boorucopy.ogg');
+var copy_sound = GM_getValue('copy_sound', '');
 var iv2_confidence_rating = GM_getValue('iv2_confidence_rating', 20.0);
 var attach_explicit = GM_getValue('attach_explicit', true);
 var attach_gid = GM_getValue('attach_gid', true);
 var div_top = GM_getValue('div_top', false);
 
+// Fix for older versions linking this.
+if (copy_sound === 'http://heavy.noxiousnet.com/boorucopy.ogg')
+    copy_sound = '';
 
 ///////
 
