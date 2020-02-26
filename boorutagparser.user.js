@@ -187,8 +187,14 @@ function copyBooruTags(noRating)
 {
     var tags = [];
     // Instead of having a list of boorus and their tags and tag structures I just make a big catch-all.
+    
+    // danbooru-like-new
+    insertTags(tags, '#tag-list li.tag-type-3 > a.search-tag', 'series:');
+    insertTags(tags, '#tag-list li.tag-type-1 > a.search-tag', 'creator:');
+    insertTags(tags, '#tag-list li.tag-type-4 > a.search-tag', 'character:');
+    insertTags(tags, '#tag-list li.tag-type-0 > a.search-tag', '');    
 
-    // danbooru-like
+    // danbooru-like-old
     insertTags(tags, '#tag-list li.category-3 > a.search-tag', 'series:');
     insertTags(tags, '#tag-list li.category-1 > a.search-tag', 'creator:');
     insertTags(tags, '#tag-list li.category-4 > a.search-tag', 'character:');
