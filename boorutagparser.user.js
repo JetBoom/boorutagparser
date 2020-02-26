@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Booru Tag Parser
 // @namespace    http://average.website
-// @version      1.1.4
-// @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru.
-// @author       William Moodhe
-// @downloadURL  https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
-// @updateURL    https://github.com/JetBoom/boorutagparser/raw/master/boorutagparser.user.js
+// @version      1.1.5
+// @description  Copy current post tags and rating on boorus and illustration2vec in to the clipboard for easy import in to a program or another booru. (fork will not replace underscores with spaces and fixes new danbooru tag data presentation)
+// @author       William Moodhe (fork by GlassedSilver)
+// @downloadURL  https://github.com/GlassedSilver/boorutagparser/raw/master/boorutagparser.user.js
+// @updateURL    https://github.com/GlassedSilver/boorutagparser/raw/master/boorutagparser.user.js
 
 // Illustration2Vec
 // @include      *demo.illustration2vec.net*
@@ -89,7 +89,7 @@ function insertTags(tags, selector, prefix, stripns)
         var text = element.innerHTML;
         if (text.length > 1) // Don't copy - + or ?
         {
-            text = replaceAll(text, '_', ' ');
+            // text = replaceAll(text, '_', ' ');      /* Personal preference: Some users need underscores, some need spaces */
             text = replaceAll(text, '&gt;', '>');
             text = replaceAll(text, '&lt;', '<');
 
