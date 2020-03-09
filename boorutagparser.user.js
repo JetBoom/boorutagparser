@@ -22,7 +22,7 @@
 // @include      *idol.sankakucomplex.com/post/show/*
 // @include      *idol.sankakucomplex.com/?tags=*
 // @include      *behoimi.org/post/show/*
-// @include      *e621.net/post/show/*
+// @include      *e621.net/posts/*
 // @include      *konachan.com/post/*
 // @include      *konachan.net/post/*
 // @include      *shimmie.katawa-shoujo.com/post/*
@@ -365,8 +365,8 @@ function doDownload()
 {
     var a = document.querySelector('a.original-file-unchanged');
     if (!a)
-        a = document.querySelector('a[href*="/data/_"], #post-information > ul > li > a[href*="/__"], a#highres, a[itemprop="contentSize"], li > a[href*="/images/"], section#image-container > a > img, img#image, img[src*="/_images/"], a[href*="/img/download"][title="Download (short filename)"], a[href*="/img/download"][title="Download (no tags in filename)"], form[action*="/_images/"], source[src]');
-
+        a = document.querySelector('#image-download-link > a, a[href*="/data/_"], #post-information > ul > li > a[href*="/__"], a#highres, a[itemprop="contentSize"], li > a[href*="/images/"], section#image-container > a > img, img[src*="/_images/"], a[href*="/img/download"][title="Download (short filename)"], a[href*="/img/download"][title="Download (no tags in filename)"], form[action*="/_images/"], source[src]');
+    
     if (!a)
         return;
 
