@@ -206,6 +206,7 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-artist > a', 'creator:');
     insertTags(tags, 'li.tag-type-character > a', 'character:');
     insertTags(tags, 'li.tag-type-model > a', 'model:');
+    insertTags(tags, 'li.tag-type-idol > a', 'model:');
     insertTags(tags, 'li.tag-type-general > a', '');
     insertTags(tags, 'li.tag-type-studio > a', 'studio:');
     insertTags(tags, 'li.tag-type-circle > a', 'studio:');
