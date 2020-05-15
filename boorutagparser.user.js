@@ -215,7 +215,7 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-meta > a', 'meta:');
     insertTags(tags, 'li.tag-type-species > a', 'species:');
     insertTags(tags, 'li.tag-type-faults > a', 'fault:');
-    insertTags(tags, 'li.tag-type-genre > a', 'genre');
+    insertTags(tags, 'li.tag-type-genre > a', 'genre:');
 
     // derpibooru-like
      insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]):not([data-tag-slug="them%27s+fightin%27+herds"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
