@@ -14,6 +14,7 @@
 // @include      *booru*/post*
 // @include      *booru*/*?page=post*
 // @include      *booru*/?page=post
+// @include      *booru*/index.php?id=*
 
 // Boorus with weird names
 // @include      *rule34.xxx/index.php?page=post*
