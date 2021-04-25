@@ -369,6 +369,7 @@ function doDownload()
     var a = document.querySelector('a.original-file-unchanged');
     if (!a)
         a = document.querySelector('#image-download-link > a, a[href*="/data/_"], #post-information > ul > li > a[href*="/__"], a#highres, a[itemprop="contentSize"], li > a[href*="/images/"], section#image-container > a > img, img[src*="/_images/"], a[href*="/img/download"][title="Download (short filename)"], a[href*="/img/download"][title="Download (no tags in filename)"], form[action*="/_images/"], source[src], div a#image-link[href*="/data/"], div video[id="image"]');    
+    
     if (!a)
         return;
 
