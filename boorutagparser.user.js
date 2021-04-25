@@ -14,6 +14,7 @@
 // @include      *booru*/post*
 // @include      *booru*/*?page=post*
 // @include      *booru*/?page=post
+// @include      *booru*/index.php?id=*
 
 // Boorus with weird names
 // @include      *rule34.xxx/index.php?page=post*
@@ -218,20 +219,20 @@ function copyBooruTags(noRating)
     insertTags(tags, 'li.tag-type-genre > a', 'genre:');
 
     // derpibooru-like
-     insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]):not([data-tag-slug="them%27s+fightin%27+herds"]) > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
-    insertTags(tags, '.tag-list .tag.tag-ns-oc > a', 'character:', true);
-    insertTags(tags, '.tag-list .tag.tag-system > a', 'rating:');
-    insertTags(tags, '.tag-list [class="tag dropdown"]:not([data-tag-category="character"]):not([data-tag-category="origin"]):not([data-tag-category="spoiler"]):not([data-tag-category="episode"]) > a', ''); // generic tags on derpibooru do not have a "namespace" class of their own, this seems to be the best way to match generic tags
-    insertTags(tags, '.tag-list [data-tag-category="character"] > a', 'character:'); // grabs the new character tags on Derpibooru and gives them a proper character namespace for Hydrus
-    insertTags(tags, '.tag-list [data-tag-category="episode"] > a', 'episode:'); // grabs the show episode title and gives it an episode namespace for Hydrus
-    insertTags(tags, '[data-tag-name="edit"] > a', ''); //Since derpibooru has edits tagged as an artist, this converts that to a general edit tag
-    insertTags(tags, '[data-tag-slug="derpibooru+exclusive"] > a', ''); //Since derpibooru has derpi exclusives tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="edited+screencap"] > a', ''); //makes the edited screencap into a general tag
-    insertTags(tags, '[data-tag-slug="screencap"] > a', ''); //Makes the screencap tag into a general tag
-    insertTags(tags, '[data-tag-slug="anonymous+artist"] > a', ''); //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings
-    insertTags(tags, '[data-tag-slug="alternate+version"] > a', ''); //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="color+edit"] > a', ''); //Since derpibooru has color edits tagged as an artist, this converts that to a general tag
-    insertTags(tags, '[data-tag-slug="them%27s+fightin%27+herds"] > a', 'series:'); //Adds them's fightin' herds as a series tag
+     insertTags(tags, '.tag-list [data-tag-category="origin"]:not([data-tag-name="edit"]):not([data-tag-slug="derpibooru+exclusive"]):not([data-tag-slug="edited+screencap"]):not([data-tag-slug="screencap"]):not([data-tag-slug="anonymous+artist"]):not([data-tag-slug="alternate+version"]):not([data-tag-slug="color+edit"]):not([data-tag-slug="them%27s+fightin%27+herds"]) > span > a', 'creator:', true); //Fixes a problem where the tag parser script would fail to work on pages with these tags, or multiple of these tags.
+    insertTags(tags, '.tag-list .tag.tag-ns-oc > span > a', 'character:', true);
+    insertTags(tags, '.tag-list .tag.tag-system > span > a', 'rating:');
+    insertTags(tags, '.tag-list [class="tag dropdown"]:not([data-tag-category="character"]):not([data-tag-category="origin"]):not([data-tag-category="spoiler"]):not([data-tag-category="episode"]) > span > a', ''); // generic tags on derpibooru do not have a "namespace" class of their own, this seems to be the best way to match generic tags
+    insertTags(tags, '.tag-list [data-tag-category="character"] > span > a', 'character:'); // grabs the new character tags on Derpibooru and gives them a proper character namespace for Hydrus
+    insertTags(tags, '.tag-list [data-tag-category="episode"] > span > a', 'episode:'); // grabs the show episode title and gives it an episode namespace for Hydrus
+    insertTags(tags, '[data-tag-name="edit"] > span > a', ''); //Since derpibooru has edits tagged as an artist, this converts that to a general edit tag
+    insertTags(tags, '[data-tag-slug="derpibooru+exclusive"] > span > a', ''); //Since derpibooru has derpi exclusives tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="edited+screencap"] > span > a', ''); //makes the edited screencap into a general tag
+    insertTags(tags, '[data-tag-slug="screencap"] > span > a', ''); //Makes the screencap tag into a general tag
+    insertTags(tags, '[data-tag-slug="anonymous+artist"] > span > a', ''); //Makes Anon Artist into a general tag which Hydrus will then convert into a creator tag via tag siblings
+    insertTags(tags, '[data-tag-slug="alternate+version"] > span > a', ''); //Since derpibooru has alternate versions tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="color+edit"] > span > a', ''); //Since derpibooru has color edits tagged as an artist, this converts that to a general tag
+    insertTags(tags, '[data-tag-slug="them%27s+fightin%27+herds"] > span > a', 'series:'); //Adds them's fightin' herds as a series tag
 
     // sofurry like
     insertTags(tags, '.titlehover > a', '');
