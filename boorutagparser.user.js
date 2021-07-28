@@ -88,7 +88,7 @@ function insertTags(tags, selector, prefix, stripns)
     {
         var element = elements[i];
         var text = element.innerHTML;
-        if (text.length > 1) // Don't copy - + or ?
+        if (text !== '-' && text !== '+' && text !== '?') // Don't copy - + or ?
         {
             text = replaceAll(text, '_', ' ');
             text = replaceAll(text, '&gt;', '>');
