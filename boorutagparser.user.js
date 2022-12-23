@@ -193,6 +193,7 @@ function copyBooruTags(noRating)
     insertTags(tags, '#tag-list li.tag-type-3 > a.search-tag', 'series:');
     insertTags(tags, '#tag-list li.tag-type-1 > a.search-tag', 'creator:');
     insertTags(tags, '#tag-list li.tag-type-4 > a.search-tag', 'character:');
+    insertTags(tags, '#tag-list li.tag-type-5 > a.search-tag', 'meta:');
     insertTags(tags, '#tag-list li.tag-type-0 > a.search-tag', '');    
 
     // danbooru-like-old
