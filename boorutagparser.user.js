@@ -194,6 +194,7 @@ function copyBooruTags(noRating)
     insertTags(tags, '#tag-list li.tag-type-1 > a.search-tag', 'creator:');
     insertTags(tags, '#tag-list li.tag-type-4 > a.search-tag', 'character:');
     insertTags(tags, '#tag-list li.tag-type-5 > a.search-tag', 'meta:');
+    insertTags(tags, '#tag-list li.tag-type-6 > a.search-tag', 'ai-model:'); // AI models for AIBooru
     insertTags(tags, '#tag-list li.tag-type-0 > a.search-tag', '');    
 
     // danbooru-like-old
