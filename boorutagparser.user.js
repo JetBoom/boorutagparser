@@ -354,17 +354,40 @@ function doOptions() {
     optionsArea.style.display = optionsArea.style.display === 'none' ? 'block' : 'none'
 }
 
+function toBase64(arrayBuffer) {
+    return btoa(new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''))
+}
+
 function makeDownloadRequest(href, tags) {
     tags = tags ?? []
 
     GM_xmlhttpRequest({
-        'method': 'POST',
-        'url': 'http://localhost:14007/download?' + href,
-        'data': tags.join(','),
-        'anonymous': true,
-        'timeout': 12500,
-        'onerror': () => {
-            alert('Error downloading to your local server. Is boorutagparser-server running?\nGet it at github.com/JetBoom/boorutagparser-server if you do not have it.')
+        method: 'GET',
+        url: href,
+        responseType: 'arraybuffer',
+        onload: (response) => {
+            console.log('Downloaded')
+
+            const base64 = toBase64(response.response)
+
+            GM_xmlhttpRequest({
+                method: 'POST',
+                url: 'http://localhost:14007/import',
+                data: JSON.stringify({
+                    tags,
+                    url: href,
+                    fileData: base64,
+                }),
+                anonymous: true,
+                timeout: 30000,
+                onload: (response) => {
+                    console.log(response)
+                },
+                onerror: (err) => {
+                    console.error(err)
+                    alert('Error downloading to your local server. Is boorutagparser-server running?\nGet it at github.com/JetBoom/boorutagparser-server if you do not have it.')
+                }
+            })
         }
     })
 }
